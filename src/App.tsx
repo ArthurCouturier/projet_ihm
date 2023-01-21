@@ -4,14 +4,14 @@ import CurrencySelection from "./Components/CurrencySelection";
 
 function App() {
   return (
-      <div className="h-[99vh] w-[100vw] flex-grow">
+      <div className="h-[100vh] w-[100vw] flex-grow bg-slate-800 text-zinc-400">
           <div className="h-[66vh] text-center">
               Ici la sélection des produits
           </div>
           <div className={"h-[33vh] text-center"}>
-              <CurrencySelection number={"1"} />
-              <CurrencySelection number={"2"} />
-              <CurrencySelection number={"3"} />
+              <CurrencySelection desc={"Devise du prix: "} />
+              <CurrencySelection desc={"Devise de paiement: "} />
+              <CurrencySelection desc={"Devise de rendu: "} />
           </div>
       </div>
   );
