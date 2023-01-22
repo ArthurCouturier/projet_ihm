@@ -9,7 +9,7 @@ export default function Product(props: { addToPrice: (price: number) => void, na
     }
 
     return (
-        <div className={"w-[12vw] h-[12vh] border"} onClick={addPrice}>
+        <div className={"w-[12vw] h-[12vh] border my-4 mx-4"} onClick={addPrice}>
             <div> {name} </div>
             <div> {price} </div>
             <div> {currency} </div>
