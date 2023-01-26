@@ -53,7 +53,7 @@ function App() {
                 <CurrencySelection desc={"Devise de rendu: "} />
             </div>
             <div className={"h-[11vh] text-center"}>
-                <div className={"mx-auto border w-[15vw]"} onClick={reset}>
+                <div className={"mx-auto border rounded-full w-[15vw] transition duration-300 hover:scale-110"} onClick={reset}>
                     Reset
                 </div>
             </div>
