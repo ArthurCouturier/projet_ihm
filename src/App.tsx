@@ -6,8 +6,23 @@ import ProductSelection from "./Components/ProductSelection";
 function App() {
     const [totalPriceDollar, setTotalPriceDollar] = useState(0);
 
-    function addToPrice(price: number) {
+    async function addToPrice(name: string, price: number) {
         setTotalPriceDollar(totalPriceDollar + price);
+        const requestOptions = {
+            method: 'POST',
+            body: JSON.stringify({
+                'totalPriceDollar': totalPriceDollar+price,
+                'name': name
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+        };
+        // @ts-ignore
+        await fetch('http://localhost:3001/newProduct', requestOptions)
+            .then(function(response) { return response.json(); })
+            .then(function(myJson) { console.log(myJson); });
     }
 
     return (

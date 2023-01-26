@@ -1,11 +1,11 @@
 import React from "react";
 
-export default function Product(props: { addToPrice: (price: number) => void, name: string, price: string, currency: string }) {
+export default function Product(props: { addToPrice: (name: string, price: number) => void, name: string, price: string, currency: string }) {
     const { addToPrice, name, price, currency } = props;
 
     function addPrice() {
         // TODO: we have to convert to dollar. Maybe we have to do it in a specific typescript module imported
-        addToPrice(Number(price));
+        addToPrice(name, Number(price));
     }
 
     return (

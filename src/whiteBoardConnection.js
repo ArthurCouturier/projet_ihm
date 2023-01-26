@@ -19,10 +19,24 @@ app.use(function (req, res, next) {
 const cors = require('cors');
 // use it before all route definitions
 app.use(cors({origin: 'http://localhost:3000'}));
-app.get('/', (req, res) => {
+
+const bodyParser = require("body-parser");
+app.use(bodyParser.json());
+
+
+app.get('/test', (req, res) => {
     sendTest();
     res.json({return: 'Hello World!'})
 })
+app.post('/newProduct', (req, res, next) => {
+    console.log("Received new product");
+    console.log(req.body);
+    res.status(201).json({
+        message: 'Added Object !'
+    });
+    igs.outputSetString("sortie1", req.body.totalPriceDollar.toString());
+    igs.outputSetString("sortie3", req.body.name.toString());
+});
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)

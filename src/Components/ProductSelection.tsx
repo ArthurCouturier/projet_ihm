@@ -20,7 +20,7 @@ const products = [
     { name: "parfum 16", price: "63", currency: "dollar" }
 ]
 
-export default function ProductSelection(props: { addToPrice: (price: number) => void }) {
+export default function ProductSelection(props: { addToPrice: (name: string, price: number) => void }) {
     const { addToPrice } = props;
 
     return (
