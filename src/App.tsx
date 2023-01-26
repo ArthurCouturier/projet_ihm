@@ -28,6 +28,21 @@ function App() {
             .then(function(myJson) { console.log(myJson); });
     }
 
+    async function reset() {
+        setTotalPriceDollar(0);
+        const requestOptions = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+        };
+        // @ts-ignore
+        await fetch('http://localhost:3001/reset', requestOptions)
+            .then(function(response) { return response.json(); })
+            .then(function(myJson) { console.log(myJson); });
+    }
+
     return (
         <div className="h-[100vh] w-[100vw] flex-grow bg-slate-800 text-zinc-400">
             <div className="h-[66vh] text-center">
@@ -37,8 +52,10 @@ function App() {
                 <CurrencySelection desc={`Total: ${totalPriceDollar} Devise du prix: `} />
                 <CurrencySelection desc={"Devise de rendu: "} />
             </div>
-            <div className={"h-[11vh]"}>
-
+            <div className={"h-[11vh] text-center"}>
+                <div className={"mx-auto border w-[15vw]"} onClick={reset}>
+                    Reset
+                </div>
             </div>
         </div>
     );

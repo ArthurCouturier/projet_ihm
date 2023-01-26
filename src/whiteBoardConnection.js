@@ -28,13 +28,23 @@ app.get('/test', (req, res) => {
     sendTest();
     res.json({return: 'Hello World!'})
 })
-app.post('/newProduct', (req, res, next) => {
+app.post('/newProduct', (req, res) => {
     res.status(201).json({
         message: 'Added Object !'
     });
     const priceNormalized = ((req.body.totalPriceDollar * 100) >> 0.01) / 100;
-    igs.outputSetString("sortie1", (priceNormalized).toString());
-    igs.outputSetString("sortie3", req.body.name.toString());
+    igs.outputSetString("title", (priceNormalized).toString());
+    igs.outputSetString("chat", req.body.name.toString());
+});
+
+app.get('/reset', (req, res) => {
+    igs.outputSetString("title", "0");
+    // TODO: next line doesnt work
+    igs.outputSetImpulsion("clearChat");
+
+    res.status(201).json({
+        message: 'Reset done !'
+    });
 });
 
 app.listen(port, () => {
@@ -46,8 +56,8 @@ const igs = require('ingescape');
 function sendTest() {
     igs.info("Test");
     console.log("igs.info done");
-    igs.outputSetString("sortie1", "COUCOU")
-    igs.outputSetString("sortie3", "JSUIS LA")
+    igs.outputSetString("title", "COUCOU")
+    igs.outputSetString("chat", "JSUIS LA")
 
     let argsList = [];
 // argsList = igs.serviceArgsAddBool(argsList, this.boolI);
@@ -66,7 +76,6 @@ function sendTest() {
 const iopValueTypes = igs.iopValueTypes();
 
 igs.agentSetName("agent1");
-igs.agentSetName("agent2");
 
 
 igs.logSetConsole(true);
@@ -74,12 +83,12 @@ igs.logSetFile(true, null);
 igs.logSetStream(true);
 igs.definitionSetVersion("1.0");
 
-igs.outputCreate("sortie1", iopValueTypes.IGS_STRING_T, "");
-igs.outputCreate("sortie2", iopValueTypes.IGS_STRING_T, "");
-igs.outputCreate("sortie3", iopValueTypes.IGS_STRING_T, "");
+igs.outputCreate("title", iopValueTypes.IGS_STRING_T, "");
+igs.outputCreate("chat", iopValueTypes.IGS_STRING_T, "");
+igs.outputCreate("clearChat", iopValueTypes.IGS_IMPULSION_T, "");
 
 //actually start ingescape
 igs.startWithDevice("en0", 5670);
 
-igs.outputSetString("sortie1", "0");
-igs.clearOutput("sortie3");
+igs.outputSetString("title", "0");
+igs.outputSetImpulsion("clearChat");
