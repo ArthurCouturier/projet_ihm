@@ -29,12 +29,11 @@ app.get('/test', (req, res) => {
     res.json({return: 'Hello World!'})
 })
 app.post('/newProduct', (req, res, next) => {
-    console.log("Received new product");
-    console.log(req.body);
     res.status(201).json({
         message: 'Added Object !'
     });
-    igs.outputSetString("sortie1", req.body.totalPriceDollar.toString());
+    const priceNormalized = ((req.body.totalPriceDollar * 100) >> 0.01) / 100;
+    igs.outputSetString("sortie1", (priceNormalized).toString());
     igs.outputSetString("sortie3", req.body.name.toString());
 });
 
@@ -81,3 +80,6 @@ igs.outputCreate("sortie3", iopValueTypes.IGS_STRING_T, "");
 
 //actually start ingescape
 igs.startWithDevice("en0", 5670);
+
+igs.outputSetString("sortie1", "0");
+igs.clearOutput("sortie3");

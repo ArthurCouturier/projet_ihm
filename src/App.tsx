@@ -2,16 +2,19 @@ import React, {useState} from 'react';
 import './App.css';
 import CurrencySelection from "./Components/CurrencySelection";
 import ProductSelection from "./Components/ProductSelection";
+import CurrencyManager from "./assets/CurrencyManager";
+const manager = new CurrencyManager();
 
 function App() {
     const [totalPriceDollar, setTotalPriceDollar] = useState(0);
 
-    async function addToPrice(name: string, price: number) {
-        setTotalPriceDollar(totalPriceDollar + price);
+    async function addToPrice(name: string, price: number, currency: string) {
+        const newPrice = totalPriceDollar + manager.passPriceToDollar(price, currency);
+        setTotalPriceDollar(newPrice);
         const requestOptions = {
             method: 'POST',
             body: JSON.stringify({
-                'totalPriceDollar': totalPriceDollar+price,
+                'totalPriceDollar': newPrice,
                 'name': name
             }),
             headers: {
@@ -30,10 +33,12 @@ function App() {
             <div className="h-[66vh] text-center">
                 <ProductSelection  addToPrice={addToPrice} />
             </div>
-            <div className={"h-[33vh] text-center"}>
+            <div className={"h-[22vh] text-center"}>
                 <CurrencySelection desc={`Total: ${totalPriceDollar} Devise du prix: `} />
-                <CurrencySelection desc={"Devise de paiement: "} />
                 <CurrencySelection desc={"Devise de rendu: "} />
+            </div>
+            <div className={"h-[11vh]"}>
+
             </div>
         </div>
     );
