@@ -4,6 +4,7 @@ import Currency from "./Currency";
 const currencies = [
     { name: "dollar" },
     { name: "euro" },
+    { name: "dinar" },
 ];
 
 export default function CurrencySelection(props: { desc: string }) {

@@ -9,7 +9,7 @@ export default function Product(props: { addToPrice: (name: string, price: numbe
     }
 
     return (
-        <div className={"w-[12vw] h-[12vh] border my-3 mx-3 transition duration-300 hover:scale-110 rounded-2xl"} onClick={addPrice}>
+        <div className={"w-[12vw] h-[12vh] border my-3 mx-3 transition duration-300 hover:scale-110 rounded-2xl hover:cursor-pointer"} onClick={addPrice}>
             <div> {name} </div>
             <div> {price} </div>
             <div> {currency} </div>

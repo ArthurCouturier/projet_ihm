@@ -28,6 +28,8 @@ app.get('/test', (req, res) => {
     sendTest();
     res.json({return: 'Hello World!'})
 })
+
+const manager = new CurrencyManager();
 app.post('/newProduct', (req, res) => {
     res.status(201).json({
         message: 'Added Object !'
@@ -35,6 +37,7 @@ app.post('/newProduct', (req, res) => {
     const priceNormalized = ((req.body.totalPriceDollar * 100) >> 0.01) / 100;
     igs.outputSetString("title", (priceNormalized).toString());
     igs.outputSetString("chat", req.body.name.toString());
+    // igs.outputSetString("chat", manager.getCurrencyNames(priceNormalized));
 });
 
 app.get('/reset', (req, res) => {
@@ -52,6 +55,7 @@ app.listen(port, () => {
 })
 
 const igs = require('ingescape');
+const CurrencyManager = require("./assets/CurrencyManager");
 
 function sendTest() {
     igs.info("Test");

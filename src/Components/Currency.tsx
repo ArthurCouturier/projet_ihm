@@ -18,7 +18,7 @@ export default function Currency(props: { currency: string, selectCurrency: (cur
     }
 
     return (
-        <div className={"w-[5vw] mx-5 transition duration-300 text-xl text-center border hover:scale-110 rounded-xl"} onClick={changeCurrency}>
+        <div className={"w-[5vw] mx-5 transition duration-300 text-xl text-center border hover:scale-110 rounded-xl hover:cursor-pointer"} onClick={changeCurrency}>
             {currency}
         </div>
     );
