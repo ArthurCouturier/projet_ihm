@@ -7,6 +7,36 @@ const manager = new CurrencyManager();
 
 function App() {
     const [totalPriceDollar, setTotalPriceDollar] = useState(0);
+    const [paid, setPaid] = useState(0);
+    const [inCurrency, setInCurrency] = useState("dollar");
+    const changeInCurrency = async (currency: string) => {
+        setInCurrency(currency);
+        const requestOptions = {
+            method: 'POST',
+            body: JSON.stringify({
+                totalPriceDollar: totalPriceDollar,
+                currency: currency
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            }
+        };
+        await fetch('http://localhost:3001/changeInCurrency', requestOptions);
+    }
+    const [outCurrency, setOutCurrency] = useState("dollar");
+    const changeOutCurrency = async (currency: string) => {
+        setInCurrency(currency);
+        const requestOptions = {
+            method: 'POST',
+            body: JSON.stringify({currency: currency}),
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            }
+        };
+        await fetch('http://localhost:3001/changeOutCurrency', requestOptions);
+    }
 
     async function addToPrice(name: string, price: number, currency: string) {
         const newPrice = totalPriceDollar + manager.passPriceToDollar(price, currency);
@@ -49,8 +79,11 @@ function App() {
                 <ProductSelection  addToPrice={addToPrice} />
             </div>
             <div className={"h-[22vh] text-center"}>
-                <CurrencySelection desc={`Total: ${totalPriceDollar} Devise du prix: `} />
-                <CurrencySelection desc={"Devise de rendu: "} />
+                <CurrencySelection desc={`Total: ${totalPriceDollar} Devise du prix: `} currency={inCurrency} changeCurrency={changeInCurrency} />
+                <div>
+                    A payé:   <input value={paid} onChange={e => setPaid(Number(e.target.value))}/>
+                </div>
+                <CurrencySelection desc={`Devise de rendu: `} currency={outCurrency} changeCurrency={changeOutCurrency} />
             </div>
             <div className={"h-[11vh] text-center"}>
                 <div className={"mx-auto border rounded-full w-[15vw] transition duration-300 hover:scale-110 hover:cursor-pointer"} onClick={reset}>
