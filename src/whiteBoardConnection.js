@@ -51,15 +51,19 @@ app.get('/reset', (req, res) => {
     });
 });
 app.post('/changeInCurrency', (req, res) => {
-    const currency = req.body.currency;
-    const priceNormalized = ((req.body.totalPriceDollar * 100) >> 0.01) / 100;
-    const title = (priceNormalized).toString() + " " + currency.toString();
+    const inCurrency = req.body.inCurrency;
+    const outCurrency = req.body.outCurrency;
+    const priceNormalized = ((req.body.totalPrice * 100) >> 0.01) / 100;
+    const hasToReturn = req.body.hasToReturn;
+    const title = "Total: " + (priceNormalized).toString() + " " + inCurrency.toString() + " & has to return: " + hasToReturn.toString() + " " + outCurrency.toString();
     igs.outputSetString("title", title);
 });
 app.post('/changeOutCurrency', (req, res) => {
-    const currency = req.body.currency;
-    const priceNormalized = ((req.body.totalPriceDollar * 100) >> 0.01) / 100;
-    const title = (priceNormalized).toString() + " " + currency.toString();
+    const inCurrency = req.body.inCurrency;
+    const outCurrency = req.body.outCurrency;
+    const priceNormalized = ((req.body.totalPrice * 100) >> 0.01) / 100;
+    const hasToReturn = req.body.hasToReturn;
+    const title = "Total: " + (priceNormalized).toString() + " " + inCurrency.toString() + " has to return: " + hasToReturn.toString() + " " + outCurrency.toString();
     igs.outputSetString("title", title);
 });
 

@@ -11,11 +11,15 @@ function App() {
     const [inCurrency, setInCurrency] = useState("dollar");
     const changeInCurrency = async (currency: string) => {
         setInCurrency(currency);
+        const priceToShow = manager.passPriceFromDollar(totalPriceDollar, currency);
+        const hasToReturn = manager.passPriceFromDollar(totalPriceDollar - manager.passPriceToDollar(paid, outCurrency), outCurrency);
         const requestOptions = {
             method: 'POST',
             body: JSON.stringify({
-                totalPriceDollar: totalPriceDollar,
-                currency: currency
+                totalPrice: priceToShow,
+                hasToReturn: hasToReturn,
+                inCurrency: currency,
+                outCurrency: outCurrency
             }),
             headers: {
                 'Content-Type': 'application/json',
@@ -26,10 +30,17 @@ function App() {
     }
     const [outCurrency, setOutCurrency] = useState("dollar");
     const changeOutCurrency = async (currency: string) => {
-        setInCurrency(currency);
+        setOutCurrency(currency);
+        const priceToShow = manager.passPriceFromDollar(totalPriceDollar, inCurrency);
+        const hasToReturn = manager.passPriceFromDollar(totalPriceDollar - manager.passPriceToDollar(paid, currency), currency);
         const requestOptions = {
             method: 'POST',
-            body: JSON.stringify({currency: currency}),
+            body: JSON.stringify({
+                totalPrice: priceToShow,
+                hasToReturn: hasToReturn,
+                inCurrency: inCurrency,
+                outCurrency: currency
+            }),
             headers: {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
@@ -79,7 +90,7 @@ function App() {
                 <ProductSelection  addToPrice={addToPrice} />
             </div>
             <div className={"h-[22vh] text-center"}>
-                <CurrencySelection desc={`Total: ${totalPriceDollar} Devise du prix: `} currency={inCurrency} changeCurrency={changeInCurrency} />
+                <CurrencySelection desc={`Total: ${manager.passPriceFromDollar(totalPriceDollar, inCurrency)} `} currency={inCurrency} changeCurrency={changeInCurrency} />
                 <div>
                     A payé:   <input value={paid} onChange={e => setPaid(Number(e.target.value))}/>
                 </div>
