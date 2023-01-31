@@ -9,79 +9,96 @@ function App() {
     const [totalPriceDollar, setTotalPriceDollar] = useState(0);
     const [paid, setPaid] = useState(0);
     const [inCurrency, setInCurrency] = useState("dollar");
+    const [outCurrency, setOutCurrency] = useState("dollar");
+
+    const sendToWhiteboard = async (body: string) => {
+        const requestOptions = {
+            method: 'POST',
+            body: body,
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            }
+        };
+        await fetch('http://localhost:3001/majWhiteboard', requestOptions);
+    }
+
     const changeInCurrency = async (currency: string) => {
         setInCurrency(currency);
         const priceToShow = manager.passPriceFromDollar(totalPriceDollar, currency);
-        const hasToReturn = manager.passPriceFromDollar(totalPriceDollar - manager.passPriceToDollar(paid, outCurrency), outCurrency);
-        const requestOptions = {
-            method: 'POST',
-            body: JSON.stringify({
-                totalPrice: priceToShow,
-                hasToReturn: hasToReturn,
-                inCurrency: currency,
-                outCurrency: outCurrency
-            }),
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            }
-        };
-        await fetch('http://localhost:3001/changeInCurrency', requestOptions);
+        const hasToReturn = manager.passPriceFromDollar(manager.passPriceToDollar(paid, outCurrency) - totalPriceDollar, outCurrency);
+        const body = JSON.stringify({
+            totalPrice: priceToShow,
+            hasToReturn: hasToReturn,
+            inCurrency: currency,
+            outCurrency: outCurrency,
+            product: false,
+            reset: false,
+        });
+        await sendToWhiteboard(body);
     }
-    const [outCurrency, setOutCurrency] = useState("dollar");
+
     const changeOutCurrency = async (currency: string) => {
         setOutCurrency(currency);
         const priceToShow = manager.passPriceFromDollar(totalPriceDollar, inCurrency);
-        const hasToReturn = manager.passPriceFromDollar(totalPriceDollar - manager.passPriceToDollar(paid, currency), currency);
-        const requestOptions = {
-            method: 'POST',
-            body: JSON.stringify({
-                totalPrice: priceToShow,
-                hasToReturn: hasToReturn,
-                inCurrency: inCurrency,
-                outCurrency: currency
-            }),
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            }
-        };
-        await fetch('http://localhost:3001/changeOutCurrency', requestOptions);
+        const hasToReturn = manager.passPriceFromDollar(manager.passPriceToDollar(paid, currency) - totalPriceDollar, currency);
+        const body = JSON.stringify({
+            totalPrice: priceToShow,
+            hasToReturn: hasToReturn,
+            inCurrency: inCurrency,
+            outCurrency: currency,
+            product: false,
+            reset: false,
+        });
+        await sendToWhiteboard(body);
     }
 
     async function addToPrice(name: string, price: number, currency: string) {
         const newPrice = totalPriceDollar + manager.passPriceToDollar(price, currency);
+        const hasToReturn = manager.passPriceFromDollar(manager.passPriceToDollar(paid, currency) - totalPriceDollar, currency);
         setTotalPriceDollar(newPrice);
-        const requestOptions = {
-            method: 'POST',
-            body: JSON.stringify({
-                'totalPriceDollar': newPrice,
-                'name': name
-            }),
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            },
-        };
-        // @ts-ignore
-        await fetch('http://localhost:3001/newProduct', requestOptions)
-            .then(function(response) { return response.json(); })
-            .then(function(myJson) { console.log(myJson); });
+        const body = JSON.stringify({
+            totalPrice: newPrice,
+            hasToReturn: hasToReturn,
+            inCurrency: inCurrency,
+            outCurrency: currency,
+            product: name,
+            reset: false,
+        });
+        await sendToWhiteboard(body);
     }
 
     async function reset() {
         setTotalPriceDollar(0);
+        setPaid(0);
+        setInCurrency("dollar");
+        setOutCurrency("dollar");
+        const body = JSON.stringify({
+            totalPrice: totalPriceDollar,
+            hasToReturn: totalPriceDollar - paid,
+            inCurrency: inCurrency,
+            outCurrency: outCurrency,
+            product: false,
+            reset: true,
+        });
+        await sendToWhiteboard(body);
+    }
+
+    async function displayRender() {
+        const hasToReturn = manager.passPriceFromDollar(manager.passPriceToDollar(paid, outCurrency) - totalPriceDollar, outCurrency);
+        const listOfUrl: string[] = manager.getCurrencyNames(hasToReturn);
         const requestOptions = {
-            method: 'GET',
+            method: 'POST',
+            body: JSON.stringify({
+                listOfUrl: listOfUrl,
+                currency: outCurrency,
+            }),
             headers: {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
-            },
+            }
         };
-        // @ts-ignore
-        await fetch('http://localhost:3001/reset', requestOptions)
-            .then(function(response) { return response.json(); })
-            .then(function(myJson) { console.log(myJson); });
+        await fetch('http://localhost:3001/finish', requestOptions);
     }
 
     return (
@@ -92,13 +109,16 @@ function App() {
             <div className={"h-[22vh] text-center"}>
                 <CurrencySelection desc={`Total: ${manager.passPriceFromDollar(totalPriceDollar, inCurrency)} `} currency={inCurrency} changeCurrency={changeInCurrency} />
                 <div>
-                    A payé:   <input value={paid} onChange={e => setPaid(Number(e.target.value))}/>
+                    A payé: <input value={paid} onChange={e => setPaid(Number(e.target.value))}/>
                 </div>
                 <CurrencySelection desc={`Devise de rendu: `} currency={outCurrency} changeCurrency={changeOutCurrency} />
             </div>
             <div className={"h-[11vh] text-center"}>
-                <div className={"mx-auto border rounded-full w-[15vw] transition duration-300 hover:scale-110 hover:cursor-pointer"} onClick={reset}>
+                <div className={"mx-auto my-2 border rounded-full w-[15vw] transition duration-300 hover:scale-110 hover:cursor-pointer"} onClick={reset}>
                     Reset
+                </div>
+                <div className={"mx-auto my-2 border rounded-full w-[15vw] transition duration-300 hover:scale-110 hover:cursor-pointer"} onClick={displayRender}>
+                    Finish
                 </div>
             </div>
         </div>

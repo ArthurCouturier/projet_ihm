@@ -31,40 +31,51 @@ app.get('/test', (req, res) => {
     res.json({return: 'Hello World!'})
 })
 
-app.post('/newProduct', (req, res) => {
-    res.status(201).json({
-        message: 'Added Object !'
-    });
-    const priceNormalized = ((req.body.totalPriceDollar * 100) >> 0.01) / 100;
-    igs.outputSetString("title", (priceNormalized).toString());
-    igs.outputSetString("chat", req.body.name.toString());
-    // igs.outputSetString("chat", manager.getCurrencyNames(priceNormalized));
-});
-
-app.get('/reset', (req, res) => {
-    igs.outputSetString("title", "0");
-    // TODO: next line doesnt work
-    igs.outputSetImpulsion("clearChat");
-
-    res.status(201).json({
-        message: 'Reset done !'
-    });
-});
-app.post('/changeInCurrency', (req, res) => {
+app.post('/majWhiteboard', (req, res) => {
     const inCurrency = req.body.inCurrency;
     const outCurrency = req.body.outCurrency;
     const priceNormalized = ((req.body.totalPrice * 100) >> 0.01) / 100;
-    const hasToReturn = req.body.hasToReturn;
-    const title = "Total: " + (priceNormalized).toString() + " " + inCurrency.toString() + " & has to return: " + hasToReturn.toString() + " " + outCurrency.toString();
+    const hasToReturn = ((req.body.hasToReturn * 100) >> 0.01) / 100;
+    const title = "Total: " + (priceNormalized).toString() + " " + inCurrency.toString() + "   return: " + hasToReturn.toString() + " " + outCurrency.toString();
+
+    if (req.body.product) {
+        igs.outputSetString("chat", req.body.product.toString());
+    }
+
+    if (req.body.reset) {
+        igs.outputSetImpulsion("clearChat");
+    }
+
     igs.outputSetString("title", title);
 });
-app.post('/changeOutCurrency', (req, res) => {
-    const inCurrency = req.body.inCurrency;
-    const outCurrency = req.body.outCurrency;
-    const priceNormalized = ((req.body.totalPrice * 100) >> 0.01) / 100;
-    const hasToReturn = req.body.hasToReturn;
-    const title = "Total: " + (priceNormalized).toString() + " " + inCurrency.toString() + " has to return: " + hasToReturn.toString() + " " + outCurrency.toString();
-    igs.outputSetString("title", title);
+
+const fs = require('fs');
+
+app.post('/finish', (req, res) => {
+    const listOfUrl = req.body.listOfUrl;
+    const currency = req.body.currency;
+    let k = 1;
+    listOfUrl.map((url) => {
+        let argsList = [];
+        const buffer = fs.readFileSync("src/assets/" + currency + "/" + url + ".png", {encoding: 'base64url'});
+        const arrayBuffer = new Uint8Array(buffer).buffer;
+        const size = 100;
+        const fullUrl = "src/assets/" + currency + "/" + url + ".png";
+
+        const base64 = buffer.toString('base');
+
+        argsList = igs.serviceArgsAddString(argsList, fullUrl);
+        // argsList = igs.serviceArgsAddString(argsList, "https://play-lh.googleusercontent.com/ZyWNGIfzUyoajtFcD7NhMksHEZh37f-MkHVGr5Yfefa-IX7yj9SMfI82Z7a2wpdKCA=w480-h960");
+        // argsList = igs.serviceArgsAddData(argsList, arrayBuffer);
+        argsList = igs.serviceArgsAddDouble(argsList, k * size); // x
+        argsList = igs.serviceArgsAddDouble(argsList, 100 + Math.floor(k/4) * size); // y
+        // argsList = igs.serviceArgsAddDouble(argsList, size); // width
+        // argsList = igs.serviceArgsAddDouble(argsList, 85); // height
+// // image a convertir en base 64 sinon addImageFromUrl
+        igs.serviceCall("Whiteboard", "addImageFromUrl", argsList, "");
+        console.log(igs.serviceArgsCount("addImage"));
+        k++;
+    });
 });
 
 app.listen(port, () => {
