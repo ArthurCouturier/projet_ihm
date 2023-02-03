@@ -51,29 +51,45 @@ app.post('/majWhiteboard', (req, res) => {
 
 const fs = require('fs');
 
+var decodeBase64 = function(s) {
+    var e={},i,b=0,c,x,l=0,a,r='',w=String.fromCharCode,L=s.length;
+    var A="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    for(i=0;i<64;i++){e[A.charAt(i)]=i;}
+    for(x=0;x<L;x++){
+        c=e[s.charAt(x)];b=(b<<6)+c;l+=6;
+        while(l>=8){((a=(b>>>(l-=8))&0xff)||(x<(L-2)))&&(r+=w(a));}
+    }
+    return r;
+};
+function _base64ToArrayBuffer(base64) {
+    var binary_string = decodeBase64(base64);
+    var len = binary_string.length;
+    var bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) {
+        bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes.buffer;
+}
+
+app.get('/getImage', (req, res) => {
+    const currency = req.query.currency;
+    const value = req.query.value;
+    res.sendFile("/Users/arthurcouturier/WebstormProjects/projet_ihm/src/assets/"+currency+"/"+value+".jpg");
+});
+
 app.post('/finish', (req, res) => {
     const listOfUrl = req.body.listOfUrl;
     const currency = req.body.currency;
     let k = 1;
     listOfUrl.map((url) => {
         let argsList = [];
-        const buffer = fs.readFileSync("src/assets/" + currency + "/" + url + ".png", {encoding: 'base64url'});
-        const arrayBuffer = new Uint8Array(buffer).buffer;
         const size = 100;
-        const fullUrl = "src/assets/" + currency + "/" + url + ".png";
 
-        const base64 = buffer.toString('base');
-
-        argsList = igs.serviceArgsAddString(argsList, fullUrl);
-        // argsList = igs.serviceArgsAddString(argsList, "https://play-lh.googleusercontent.com/ZyWNGIfzUyoajtFcD7NhMksHEZh37f-MkHVGr5Yfefa-IX7yj9SMfI82Z7a2wpdKCA=w480-h960");
-        // argsList = igs.serviceArgsAddData(argsList, arrayBuffer);
+        argsList = igs.serviceArgsAddString(argsList, "http://192.168.1.45:3001/getImage?currency="+currency+"&value="+url);
         argsList = igs.serviceArgsAddDouble(argsList, k * size); // x
         argsList = igs.serviceArgsAddDouble(argsList, 100 + Math.floor(k/4) * size); // y
-        // argsList = igs.serviceArgsAddDouble(argsList, size); // width
-        // argsList = igs.serviceArgsAddDouble(argsList, 85); // height
-// // image a convertir en base 64 sinon addImageFromUrl
+
         igs.serviceCall("Whiteboard", "addImageFromUrl", argsList, "");
-        console.log(igs.serviceArgsCount("addImage"));
         k++;
     });
 });
