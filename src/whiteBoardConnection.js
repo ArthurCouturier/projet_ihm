@@ -74,7 +74,7 @@ function _base64ToArrayBuffer(base64) {
 app.get('/getImage', (req, res) => {
     const currency = req.query.currency;
     const value = req.query.value;
-    res.sendFile("/Users/arthurcouturier/WebstormProjects/projet_ihm/src/assets/"+currency+"/"+value+".jpg");
+    res.sendFile(__dirname + "/assets/"+currency+"/"+value+".jpg");
 });
 
 app.post('/finish', (req, res) => {
