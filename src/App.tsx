@@ -86,7 +86,8 @@ function App() {
 
     async function displayRender() {
         const hasToReturn = manager.passPriceFromDollar(manager.passPriceToDollar(paid, outCurrency) - totalPriceDollar, outCurrency);
-        const listOfUrl: string[] = manager.getCurrencyNames(hasToReturn);
+        const listOfUrl: string[] = manager.getCurrencyNames(hasToReturn, outCurrency);
+        console.log(listOfUrl);
         const requestOptions = {
             method: 'POST',
             body: JSON.stringify({
